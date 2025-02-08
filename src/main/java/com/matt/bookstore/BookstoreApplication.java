@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +101,7 @@ public class BookstoreApplication implements CommandLineRunner {
 	//GET
 	@GetMapping(value = "/book/{id}")
 	public Book getBookByID(@PathVariable int id) {
-		String sql = "SELECT * FROM book WHERE id = " + id;
+		String sql = "SELECT * FROM books WHERE id = " + id;
 		List<Book> books = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Book.class));
 		return  books.get(0);
 	}
@@ -111,7 +109,7 @@ public class BookstoreApplication implements CommandLineRunner {
 	//GET
 	@GetMapping(value = "/author/{id}")
 	public Author getAuthorByID(@PathVariable int id) {
-		String sql = "SELECT * FROM author WHERE id = ?";
+		String sql = "SELECT * FROM authors WHERE id = ?";
 		List<Author> authors = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Author.class), id);
 		return  authors.get(0);
 	}
@@ -119,7 +117,7 @@ public class BookstoreApplication implements CommandLineRunner {
 	//GET
 	@GetMapping(value = "/bookByAuthor/{id}")
 	public List<Book> getBookByAuthorID(@PathVariable int id) {
-		String sql = "SELECT * FROM book WHERE author = ?";
+		String sql = "SELECT * FROM books WHERE author = ?";
 
 		List<Book> books = jdbcTemplate.query(
 				sql,
@@ -134,7 +132,7 @@ public class BookstoreApplication implements CommandLineRunner {
     @GetMapping(value = "/year/{year}")
     public Author getAuthorByBirth(@PathVariable int year) {
 
-        String sql = "SELECT * FROM autore WHERE anno_nascita =" + year;
+        String sql = "SELECT * FROM authors WHERE birth_year =" + year;
         //List<Autore> autori = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Autore.class));
 
         List<Author> authors = jdbcTemplate.query(
@@ -163,7 +161,7 @@ public class BookstoreApplication implements CommandLineRunner {
 	//GET
 	@GetMapping(value = "/genre/{id}")
 	public Genre getGenereByID(@PathVariable int id) {
-		String sql = "SELECT * FROM genere WHERE id = " + id;
+		String sql = "SELECT * FROM genres WHERE id = " + id;
 		List<Genre> genres = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Genre.class));
 		return  genres.get(0);
 	}
@@ -180,14 +178,19 @@ public class BookstoreApplication implements CommandLineRunner {
             String title = parts[0];
             String author = parts[1];
             String genre = parts[2];
+			int page_number = Integer.parseInt(parts[3]);
+    		int publication_year = Integer.parseInt(parts[4]);
+
 		Map<String,Object> params = new HashMap<>();
 		params.put("title",title);
 		params.put("author",author);
 		params.put("genre",genre);
+		params.put("page_number", page_number);
+    	params.put("publication_year", publication_year);
 
         SimpleJdbcInsert insertBook = new SimpleJdbcInsert(jdbcTemplate)
 				.withTableName("books")
-				.usingColumns("title","author","genre")
+				.usingColumns("title","author","genre","page_number", "publication_year")
 				.usingGeneratedKeyColumns("id");
 
         return getBookByID( (int) insertBook.executeAndReturnKey(params));

@@ -2,15 +2,14 @@ package com.matt.bookstore;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.time.LocalDateTime;
 
-@JsonIncludeProperties({"title","author","genre"})
-@JsonPropertyOrder({"title","author","genre"})
+@JsonIncludeProperties({"id", "title", "author", "page_number", "publication_year", "genre"})
+@JsonPropertyOrder({"id", "title", "author", "page_number", "publication_year", "genre"})
 public class Book {
     private int id;
     private String title;
     private int page_number;
-    private LocalDateTime publication_year;
+    private int publication_year;
 
     private String name;
     private String surname;
@@ -18,31 +17,33 @@ public class Book {
     private String genre;
 
 
-    protected Book(String title, String name, String surname, int page_number, String genre){
+    protected Book(String title, String name, String surname, int page_number, String genre, int publication_year){
         this.title = title;
         this.author = name + " " + surname;
-        this.surname=surname;
+        this.surname = surname;
         this.name = name;
-        this.page_number=page_number;
-        this.genre=genre;
-    }
-
-    protected Book(String title, String author, String genre){
-        this.title = title;
-        this.author = author;
-        this.publication_year = publication_year;
         this.page_number = page_number;
         this.genre = genre;
+        this.publication_year = publication_year;  
     }
-    protected Book(int id, String title, String author, String genre){
+    
+    protected Book(String title, String author, String genre, int page_number, int publication_year){
+        this.title = title;
+        this.author = author;
+        this.page_number = page_number;
+        this.genre = genre;
+        this.publication_year = publication_year;  
+    }
+    
+    protected Book(int id, String title, String author, String genre, int page_number, int publication_year){
         this.id = id;
         this.title = title;
         this.author = author;
-        this.publication_year = publication_year;
         this.page_number = page_number;
         this.genre = genre;
+        this.publication_year = publication_year;  
     }
-
+    
     protected Book(){}
 
     @Override
@@ -58,23 +59,23 @@ public class Book {
         this.id = id;
     }
 
-    public String gettitle() {
+    public String getTitle() {
         return title;
     }
 
-    public void settitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public int getpage_number() {
+    public int getPage_number() {
         return page_number;
     }
 
-    public void setpage_number(int page_number) {
+    public void setPage_number(int page_number) {
         this.page_number = page_number;
     }
 
-    public String getAutore() {
+    public String getAuthor() {
         return author;
     }
 
@@ -107,11 +108,11 @@ public class Book {
     }
 
 
-    public LocalDateTime getPublicYear() {
+    public int getPublication_year() {
         return publication_year;
     }
 
-    public void setPublicYear(LocalDateTime publication_year) {
+    public void setPublication_year(int publication_year) {
         this.publication_year = publication_year;
     }
 }
