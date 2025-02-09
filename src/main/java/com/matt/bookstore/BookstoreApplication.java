@@ -81,7 +81,7 @@ public class BookstoreApplication implements CommandLineRunner {
 
 	//GET
 	@GetMapping(value = "/author")
-	public List<Author> getAllAutori() {
+	public List<Author> getAllAuthors() {
 		String sql = "SELECT * FROM authors";
 		List<Author> authors = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Author.class));
 		//return libreriaService.findAllBooks();
@@ -133,8 +133,7 @@ public class BookstoreApplication implements CommandLineRunner {
     public Author getAuthorByBirth(@PathVariable int year) {
 
         String sql = "SELECT * FROM authors WHERE birth_year =" + year;
-        //List<Autore> autori = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Autore.class));
-
+        
         List<Author> authors = jdbcTemplate.query(
                 sql,
                 BeanPropertyRowMapper.newInstance(Author.class)
@@ -146,13 +145,14 @@ public class BookstoreApplication implements CommandLineRunner {
 	@GetMapping(value = "/bookByBirth/{year}")
 	public List<Book> getBookByBirth(@PathVariable int year) {
 
-		String sql2 = "SELECT b.id , b.title , b.author , b.genre FROM books b INNER JOIN authors a on b.author = a.author WHERE a.birth_year >=" + year;
-
-		String sql = "SELECT * FROM books WHERE autore = ?";
+		String sql2 = "SELECT b.id , b.title , b.author , b.page_number, b.publication_year, b.genre FROM books b "+ 
+				"INNER JOIN authors a ON b.author = a.author WHERE a.birth_year >= ? " +
+				"ORDER BY b.publication_year DESC";
 
 		List<Book> books = jdbcTemplate.query(
 				sql2,
-				BeanPropertyRowMapper.newInstance(Book.class)
+				BeanPropertyRowMapper.newInstance(Book.class),
+				year
 		);
 
 		return  books;
@@ -167,11 +167,8 @@ public class BookstoreApplication implements CommandLineRunner {
 	}
 
 
-//	//POST
-//    @PostMapping(value = "/Book/{titolo}-{autore}-{genere}")
-//    public Book postBook(@PathVariable String autore,
-//						  @PathVariable String titolo,
-//						  @PathVariable String genere) {
+	//POST, value = "/book/{titolo}-{autore}-{genere}")
+
     @PostMapping(value = "/book/{data}")
         public Book postBook(@PathVariable String data) {
             String[] parts = data.split("-");
@@ -197,17 +194,17 @@ public class BookstoreApplication implements CommandLineRunner {
     }
 
 	//POST
-	@PostMapping(value = "/author/{author}-{birth}")
+	@PostMapping(value = "/author/{author}-{birth_year}")
 	public Author postAuthor(@PathVariable String author,
-							 @PathVariable int birth) {
+							 @PathVariable int birth_year) {
 
 		Map<String,Object> params = new HashMap<>();
 		params.put("author",author);
-		params.put("birth",birth);
+		params.put("birth_year",birth_year);
 
 		SimpleJdbcInsert insertAutore = new SimpleJdbcInsert(jdbcTemplate)
-				.withTableName("author")
-				.usingColumns("author","birth")
+				.withTableName("authors")
+				.usingColumns("author","birth_year")
 				.usingGeneratedKeyColumns("id");
 
 		return getAuthorByID( (int) insertAutore.executeAndReturnKey(params));
@@ -218,10 +215,10 @@ public class BookstoreApplication implements CommandLineRunner {
 	public Genre postGenre(@PathVariable String genre) {
 
 		Map<String,Object> params = new HashMap<>();
-		params.put("genere",genre);
+		params.put("genre",genre);
 
 		SimpleJdbcInsert insertGenre = new SimpleJdbcInsert(jdbcTemplate)
-				.withTableName("genre")
+				.withTableName("genres")
 				.usingColumns("genre").usingGeneratedKeyColumns("id");
 
 		return getGenreByID( (int) insertGenre.executeAndReturnKey(params));
