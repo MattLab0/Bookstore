@@ -57,7 +57,6 @@ public class BookstoreApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 //      SimpleJdbcInsert insertBook = new SimpleJdbcInsert(jdbcTemplate);
-
 //		insertBook.withTableName("autore");
 //		Autore autore = new  Autore(1,"Agatha Christie");
 //		BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(autore);
@@ -101,8 +100,8 @@ public class BookstoreApplication implements CommandLineRunner {
 	//GET
 	@GetMapping(value = "/book/{id}")
 	public Book getBookByID(@PathVariable int id) {
-		String sql = "SELECT * FROM books WHERE id = " + id;
-		List<Book> books = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Book.class));
+		String sql = "SELECT * FROM books WHERE id = ?";
+		List<Book> books = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Book.class), id);
 		return  books.get(0);
 	}
 
@@ -132,11 +131,12 @@ public class BookstoreApplication implements CommandLineRunner {
     @GetMapping(value = "/year/{year}")
     public Author getAuthorByBirth(@PathVariable int year) {
 
-        String sql = "SELECT * FROM authors WHERE birth_year =" + year;
+        String sql = "SELECT * FROM authors WHERE birth_year = ?";
         
         List<Author> authors = jdbcTemplate.query(
                 sql,
-                BeanPropertyRowMapper.newInstance(Author.class)
+                BeanPropertyRowMapper.newInstance(Author.class),
+				year
         );
         return  authors.get(0);
     }
@@ -160,10 +160,22 @@ public class BookstoreApplication implements CommandLineRunner {
 
 	//GET
 	@GetMapping(value = "/genre/{id}")
-	public Genre getGenereByID(@PathVariable int id) {
-		String sql = "SELECT * FROM genres WHERE id = " + id;
-		List<Genre> genres = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Genre.class));
+	public Genre getGenreByID(@PathVariable int id) {
+		String sql = "SELECT * FROM genres WHERE id = ?";
+		List<Genre> genres = jdbcTemplate.query(
+			sql, 
+			BeanPropertyRowMapper.newInstance(Genre.class),
+			id);
 		return  genres.get(0);
+	}
+
+	//GET
+	@GetMapping(value = "/booksByGenreID/{id}")
+	public List<Book> getBookByGenreID(@PathVariable int id) {
+
+		String sql = "SELECT * FROM books WHERE genre = '"+ getGenreByID(id).getGenre() + "'";
+		List<Book> books = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Book.class));
+		return  books;
 	}
 
 
@@ -224,18 +236,5 @@ public class BookstoreApplication implements CommandLineRunner {
 		return getGenreByID( (int) insertGenre.executeAndReturnKey(params));
 	}
 		
-	public Genre getGenreByID(int executeAndReturnKey) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getGenreByID'");
-	}
-		
-	//GET
-	@GetMapping(value = "/booksByGenreID/{id}")
-	public List<Book> getBookByGenreID(@PathVariable int id) {
-
-		String sql = "SELECT * FROM books WHERE genere = '"+ getGenereByID(id).getGenre() + "'";
-		List<Book> books = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Book.class));
-		return  books;
-	}
 
 }

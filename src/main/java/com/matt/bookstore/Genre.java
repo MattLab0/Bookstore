@@ -2,7 +2,7 @@ package com.matt.bookstore;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
-@JsonIncludeProperties ({"genre"})
+@JsonIncludeProperties ({"id","genre"})
 public class Genre {
 
     private String genre;
